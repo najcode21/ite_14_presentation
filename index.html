@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ITE 14 · Group 6 · Divide &amp; Conquer and Greedy</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fffaf6;--card:#fff;--line:#f1d9c9;--or:#ff5a14;--or2:#d9480f;--tx:#1b1210;--mu:#7a6a60;--ok:#12a566}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#fff3ea;overflow:hidden;font-family:Inter,system-ui,sans-serif;color:var(--tx)}
+body{display:flex;flex-direction:column}main{flex:1;position:relative;overflow:hidden;min-height:0}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;background:var(--bg);border-radius:22px;overflow:hidden;box-shadow:0 20px 60px rgba(120,50,10,.18),0 0 0 1px var(--line)}
+.slide{position:absolute;inset:0;padding:56px 72px;display:none;flex-direction:column;justify-content:center;gap:22px;
+ background:radial-gradient(ellipse 60% 70% at 92% 8%,rgba(255,90,20,.20),transparent 65%),radial-gradient(ellipse 40% 40% at 0 100%,rgba(255,90,20,.10),transparent 70%),var(--bg)}
+.slide.on{display:flex;animation:in .45s ease}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+.eyebrow{letter-spacing:.28em;font-size:13px;color:var(--or2);text-transform:uppercase}
+h1{font-size:66px;font-weight:400;line-height:1.05}
+h2{font-size:44px;font-weight:400;line-height:1.1}
+h1 em,h2 em{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--or)}
+p,li{color:#4a3d36;font-size:20px;line-height:1.5;font-weight:300}
+.mu{color:var(--mu)}
+.grid{display:grid;gap:18px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:linear-gradient(160deg,#fff,#fff6ee);border:1px solid var(--line);border-radius:16px;padding:22px 24px;box-shadow:0 6px 22px rgba(120,50,10,.07)}.card.g{border-color:var(--ok)}
+.card h3{font-size:20px;font-weight:600;margin-bottom:8px}
+.card.hot{border-color:var(--or);box-shadow:0 8px 30px rgba(255,90,20,.22)}
+.tag{display:inline-block;background:var(--or);color:#fff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:99px;letter-spacing:.08em}
+.big{font-size:34px;color:var(--or);font-weight:600}
+ul{padding-left:20px}li{margin:6px 0}
+.arr{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.c{min-width:56px;height:56px;border:1px solid var(--line);background:#fff;border-radius:10px;display:grid;place-items:center;font-size:22px;font-weight:600}
+.c.a{border-color:var(--or);background:rgba(255,90,20,.12);color:var(--or2)}
+.c.g{border-color:var(--ok);background:rgba(18,165,102,.12);color:var(--ok)}
+.c.x{opacity:.35;text-decoration:line-through}
+.lbl{font-size:14px;color:var(--mu);min-width:110px}
+.row{display:flex;gap:14px;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:18px}
+th{color:var(--or2);text-align:left;font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+td,th{padding:10px 14px;border-bottom:1px solid var(--line)}
+td[contenteditable]{color:var(--or2);outline:none}
+.cx td:first-child{font-weight:600}
+code{font-family:ui-monospace,Menlo,monospace;color:var(--or2);font-size:.92em}
+header{height:64px;display:flex;align-items:center;gap:28px;padding:0 32px;background:#fff;border-bottom:1px solid var(--line);flex:none}
+.logo{font-weight:600;font-size:17px;white-space:nowrap}.logo b{color:var(--or);font-family:Fraunces,Georgia,serif;font-style:italic}
+nav{display:flex;gap:6px;flex:1;justify-content:center;flex-wrap:wrap}
+nav a{font-size:14px;color:#5a4a41;padding:8px 14px;border-radius:99px;cursor:pointer;text-decoration:none;transition:.2s}
+nav a:hover{background:#fff1e8;color:var(--or)}nav a.on{background:#fff1e8;color:var(--or);font-weight:600}
+.btn{font:600 15px Inter,sans-serif;border:0;border-radius:99px;padding:12px 26px;cursor:pointer;transition:.2s}
+.pri{background:var(--or);color:#fff;box-shadow:0 8px 22px rgba(255,90,20,.35)}.pri:hover{transform:translateY(-2px);background:#e84a08}
+.sec{background:#fff;color:var(--tx);border:1px solid var(--line)}.sec:hover{border-color:var(--or);color:var(--or)}
+.btn:disabled{opacity:.35;cursor:default;transform:none;box-shadow:none}
+footer{height:76px;flex:none;background:#fff;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:relative}
+.dots{display:flex;gap:8px;align-items:center}.dots i{width:9px;height:9px;border-radius:9px;background:#f1d9c9;cursor:pointer;transition:.25s}.dots i.on{width:28px;background:var(--or)}
+#ct{font-size:13px;color:var(--mu);min-width:200px;text-align:center}
+.hint{font-size:12px;color:var(--mu)}
+@media(max-width:900px){nav,.hint{display:none}}
+#notes{position:fixed;left:0;right:0;bottom:76px;background:#fffffff2;border-top:2px solid var(--or);padding:14px 28px;font-size:16px;color:#2a1d17;display:none;z-index:9;max-height:30vh;overflow:auto;box-shadow:0 -8px 30px rgba(0,0,0,.1)}
+#notes.on{display:block}
+aside{display:none}
+</style></head><body>
+<header><div class="logo">ITE 14 <b>Group 6</b></div>
+<nav id="nav"><a data-g="0">Intro</a><a data-g="2">Divide &amp; Conquer</a><a data-g="3">D3 Max Subarray</a><a data-g="5">D4 Inversions</a><a data-g="7">G1 Greedy</a><a data-g="9">Compare</a><a data-g="10">Program</a><a data-g="11">Results</a></nav>
+<button class="btn pri" onclick="show(0)">Start Over</button></header>
+<main><div id="stage">
+
+<section class="slide">
+ <div class="eyebrow">ITE 14 · Applications of Data Structures · Section BREU1 · Group 6</div>
+ <h1>Divide &amp; Conquer<br>meets <em>Greedy</em></h1>
+ <p style="max-width:700px">Three micro-topics, explained for someone who has never seen them: <b>D3 Maximum Subarray</b>, <b>D4 Counting Inversions</b> and <b>G1 Activity Selection</b>.</p>
+ <div class="row"><span class="tag">MEMBER 1</span><span class="tag">MEMBER 2</span><span class="tag">MEMBER 3</span><span class="mu">&larr; replace with your names</span></div>
+ <aside>[Member 1 · ~0:30] Greet, introduce every member by name, say the three topics. Everyone must speak at least once in the video.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">Roadmap · ~9 minutes</div>
+ <h2>What you will <em>learn</em></h2>
+ <div class="grid g3">
+  <div class="card"><h3>1 · Divide &amp; Conquer</h3><p>The big idea, then D3 Maximum Subarray and D4 Counting Inversions.</p></div>
+  <div class="card"><h3>2 · Greedy</h3><p>G1 Activity Selection: why picking the “best next” works here.</p></div>
+  <div class="card"><h3>3 · Our Program</h3><p>main.c, edge cases and the results table (N = 100, 1,000, 10,000).</p></div>
+ </div>
+ <p class="mu">For each topic: plain words &rarr; hand trace &rarr; step-by-step &rarr; complexity &rarr; when to use it.</p>
+ <aside>[Member 1 · ~0:30] Read the roadmap. Promise: no jargon without a plain-words explanation first.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">Concept · Divide &amp; Conquer</div>
+ <h2>Break it. Solve it. <em>Combine</em> it.</h2>
+ <div class="grid g3">
+  <div class="card"><span class="big">1</span><h3>Divide</h3><p>Split the problem into smaller copies of itself (usually two halves).</p></div>
+  <div class="card"><span class="big">2</span><h3>Conquer</h3><p>Solve each half. If it is tiny (1 element), the answer is trivial.</p></div>
+  <div class="card"><span class="big">3</span><h3>Combine</h3><p>Merge the small answers into the answer for the whole problem.</p></div>
+ </div>
+ <p>Analogy: grading 100 exams. Split the pile between 2 friends, they split again… then add the totals. Each split halves the work, so there are only about <code>log₂ n</code> levels.</p>
+ <aside>[Member 1 · ~1:00] Use the exam-pile analogy. Every D&amp;C solution in our program has an explicit divide, conquer and combine step (Section C.3 requirement).</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">D3 · Maximum Subarray · Hand trace</div>
+ <h2>Find the contiguous slice with the <em>biggest sum</em></h2>
+ <div class="row"><span class="lbl">Array (n = 8)</span><div class="arr"><div class="c">-2</div><div class="c">1</div><div class="c">-3</div><div class="c">4</div><div class="c">-1</div><div class="c">2</div><div class="c">1</div><div class="c">-5</div></div></div>
+ <div class="row"><span class="lbl">Divide</span><div class="arr"><div class="c a">-2</div><div class="c a">1</div><div class="c a">-3</div><div class="c a">4</div><span class="mu">|</span><div class="c">-1</div><div class="c">2</div><div class="c">1</div><div class="c">-5</div></div></div>
+ <div class="row"><span class="lbl">Crossing slice</span><div class="arr"><div class="c x">-2</div><div class="c x">1</div><div class="c x">-3</div><div class="c g">4</div><div class="c g">-1</div><div class="c g">2</div><div class="c g">1</div><div class="c x">-5</div><span class="big" style="margin-left:14px">= 6</span></div></div>
+ <div class="grid g3">
+  <div class="card"><h3>Left half best</h3><p>4</p></div>
+  <div class="card"><h3>Right half best</h3><p>2 + 1 = 3</p></div>
+  <div class="card hot"><h3>Crossing best</h3><p>best left-suffix 4 + best right-prefix 2 = <b>6</b> &rarr; answer 6</p></div>
+ </div>
+ <aside>[Member 2 · ~1:15] Do this on paper or whiteboard on camera. Left suffix sums from the middle going left: 4, 1, 2, 0, so best is 4. Right prefix sums going right: -1, 1, 2, -3, so best is 2. Answer = max(4, 3, 6) = 6.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">D3 · Step by step · Complexity</div>
+ <h2>Three candidates, <em>pick the max</em></h2>
+ <div class="grid g2">
+  <div class="card"><h3>Algorithm</h3><ul>
+   <li><b>Divide:</b> split at the middle.</li>
+   <li><b>Conquer:</b> best slice entirely left; best entirely right.</li>
+   <li><b>Combine:</b> best slice crossing the middle (scan outward both ways), return the largest of the three.</li>
+   <li>Base case: 1 element is its own answer.</li></ul></div>
+  <div class="card"><h3>Why <code>n log n</code>?</h3><p><code>T(n) = 2T(n/2) + n</code>: two half-problems plus a linear scan for the crossing slice, over log₂ n levels.</p>
+  <table class="cx"><tr><th>Best</th><th>Average</th><th>Worst</th><th>Space</th></tr><tr><td>n log n</td><td>n log n</td><td>n log n</td><td>log n</td></tr></table>
+  <p class="mu" style="margin-top:10px">Same for every input: it always splits and scans.</p></div>
+ </div>
+ <p><b>Use it:</b> to learn D&amp;C, or in parallel settings. <b>Skip it:</b> Kadane’s single pass does the same job in <code>O(n)</code>.</p>
+ <aside>[Member 2 · ~1:15] Explain the recurrence in plain words. Mention Kadane's algorithm honestly: D&amp;C is not the fastest here, but it teaches the pattern.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">D4 · Counting Inversions · Hand trace</div>
+ <h2>How <em>out of order</em> is this list?</h2>
+ <p>An inversion is a pair where a bigger number sits before a smaller one. Counted during a <b>merge sort</b>.</p>
+ <div class="row"><span class="lbl">Divide</span><div class="arr"><div class="c">2</div><div class="c">4</div><div class="c">1</div><div class="c">3</div><span class="mu">|</span><div class="c">5</div><div class="c">8</div><div class="c">7</div><div class="c">6</div></div></div>
+ <div class="row"><span class="lbl">Merge left</span><div class="arr"><div class="c a">2</div><div class="c a">4</div><span class="mu">+</span><div class="c a">1</div><div class="c a">3</div><span class="mu">&rarr; take 1: 2 left, take 3: 1 left</span><span class="big">+3</span></div></div>
+ <div class="row"><span class="lbl">Merge right</span><div class="arr"><div class="c a">5</div><div class="c a">8</div><span class="mu">+</span><div class="c a">6</div><div class="c a">7</div><span class="mu">&rarr; plus 1 from [7,6]</span><span class="big">+3</span></div></div>
+ <div class="row"><span class="lbl">Final merge</span><div class="arr"><div class="c g">1</div><div class="c g">2</div><div class="c g">3</div><div class="c g">4</div><span class="mu">|</span><div class="c g">5</div><div class="c g">6</div><div class="c g">7</div><div class="c g">8</div><span class="big">+0 &rarr; total 6</span></div></div>
+ <aside>[Member 3 · ~1:15] Key trick: when merging, if we take an element from the RIGHT half, every element still waiting in the LEFT half is bigger than it, so add that many inversions. Pairs found: (2,1) (4,1) (4,3) (8,7) (8,6) (7,6) = 6.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">D4 · Step by step · Complexity</div>
+ <h2>Merge sort with a <em>counter</em></h2>
+ <div class="grid g2">
+  <div class="card"><h3>Algorithm</h3><ul>
+   <li><b>Divide:</b> split the array in half.</li>
+   <li><b>Conquer:</b> count inversions inside each half (recursively).</li>
+   <li><b>Combine:</b> merge the sorted halves; each time a right element wins, add the number of left elements remaining.</li>
+   <li>Total = left + right + cross.</li></ul></div>
+  <div class="card"><h3>Why <code>n log n</code>?</h3><p>Log₂ n levels of splitting, each level merges n elements once. Brute force checks all pairs: <code>n²/2</code>.</p>
+  <table class="cx"><tr><th>Best</th><th>Average</th><th>Worst</th><th>Space</th></tr><tr><td>n log n</td><td>n log n</td><td>n log n</td><td>n</td></tr></table>
+  <p class="mu" style="margin-top:10px">Extra array of size n is needed for merging.</p></div>
+ </div>
+ <p><b>Use it:</b> large lists, ranking similarity, measuring sortedness. <b>Skip it:</b> tiny arrays, where brute force is simpler.</p>
+ <aside>[Member 3 · ~1:15] Compare with n = 10,000: brute force is about 50 million pair checks, D&amp;C is about 130 thousand. Show this in the program results.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">G1 · Activity Selection · Hand trace</div>
+ <h2>Pick the most activities in <em>one room</em></h2>
+ <p><b>Greedy rule:</b> always take the activity that <b>finishes earliest</b> and does not clash with what you already chose.</p>
+ <div class="grid" style="grid-template-columns:repeat(8,1fr);gap:10px;text-align:center">
+  <div class="card g" style="padding:14px"><b>A</b><br><span class="mu">1–4</span><br><span style="color:var(--ok)">PICK</span></div>
+  <div class="card" style="padding:14px;opacity:.45"><b>B</b><br><span class="mu">3–5</span><br>clash</div>
+  <div class="card" style="padding:14px;opacity:.45"><b>C</b><br><span class="mu">0–6</span><br>clash</div>
+  <div class="card g" style="padding:14px"><b>D</b><br><span class="mu">5–7</span><br><span style="color:var(--ok)">PICK</span></div>
+  <div class="card" style="padding:14px;opacity:.45"><b>E</b><br><span class="mu">3–9</span><br>clash</div>
+  <div class="card" style="padding:14px;opacity:.45"><b>F</b><br><span class="mu">5–9</span><br>clash</div>
+  <div class="card" style="padding:14px;opacity:.45"><b>G</b><br><span class="mu">6–10</span><br>clash</div>
+  <div class="card g" style="padding:14px"><b>H</b><br><span class="mu">8–11</span><br><span style="color:var(--ok)">PICK</span></div>
+ </div>
+ <p>Sorted by finish time. Result: <b>A, D, H</b> = 3 activities, the maximum possible.</p>
+ <aside>[Member 1 · ~1:15] Walk left to right: A finishes at 4. Next activity must start at 4 or later: D (5). D ends at 7, next must start at 7 or later: H (8). Note: G1's real data in main.c is stored in arrays.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">G1 · Why it works · Complexity</div>
+ <h2>Why the greedy rule is <em>optimal</em></h2>
+ <div class="grid g2">
+  <div class="card hot"><h3>Two-sentence proof idea</h3><p>Finishing earliest leaves the most room for everything after it. Any best schedule can swap its first activity for the earliest-finishing one without losing a slot.</p></div>
+  <div class="card"><h3>Complexity</h3>
+  <table class="cx"><tr><th>Best</th><th>Average</th><th>Worst</th><th>Space</th></tr><tr><td>n log n</td><td>n log n</td><td>n log n</td><td>1*</td></tr></table>
+  <p class="mu" style="margin-top:10px">Sorting by finish time costs n log n; the pick-pass is only n. *Extra space beyond the sort.</p></div>
+ </div>
+ <p><b>Use it:</b> scheduling rooms, rides, CPU slots. <b>Careful:</b> greedy is only right when the problem allows it. Other rules (shortest first, earliest start) fail here.</p>
+ <aside>[Member 1 · ~1:00] Give the 1-2 sentence explanation required by Section C.3. Mention that earliest-start-first would pick C (0-6) and then only H: 2 activities, worse than 3.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">Connections · When to use what</div>
+ <h2>Same family, <em>different</em> bets</h2>
+ <div class="grid g2">
+  <div class="card"><h3>Divide &amp; Conquer</h3><ul><li>Solve sub-problems, then combine.</li><li>Recursive, often <code>n log n</code>.</li><li>Pick it when halves are independent and merging is cheap.</li></ul></div>
+  <div class="card"><h3>Greedy</h3><ul><li>Commit to the best local choice, never look back.</li><li>Usually sort + one pass.</li><li>Pick it only when a proof (or exchange argument) shows it is optimal.</li></ul></div>
+ </div>
+ <p>Link: both lean on <b>sorting</b>. D4 sorts while it counts, G1 sorts before it chooses.</p>
+ <aside>[Member 2 · ~0:45] Short connection section required when topics are mixed.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">Program walkthrough · main.c</div>
+ <h2>What our code <em>measures</em></h2>
+ <ul>
+  <li>Single file, standard library only, integer arrays, fixed <code>srand(seed)</code> for repeatable runs.</li>
+  <li>Global <code>long long comparisons</code> counter, reset before each run and printed after (no clock timing).</li>
+  <li>Runs at N = 100, 1,000, 10,000 plus an 8-element hand-trace demo.</li>
+  <li>Edge cases: empty array, one element, duplicates, already sorted, reverse sorted.</li>
+ </ul>
+ <aside>[Member 3 · ~1:00] Screen-share the terminal. Compile with gcc, run, and point to each section of the output.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">Results table · click a cell to edit</div>
+ <h2>Do the numbers match <em>theory</em>?</h2>
+ <table class="cx">
+  <tr><th>Algorithm</th><th>N = 100</th><th>N = 1,000</th><th>N = 10,000</th><th>Theory</th></tr>
+  <tr><td>D3 Max subarray (D&amp;C)</td><td contenteditable>–</td><td contenteditable>–</td><td contenteditable>–</td><td class="mu">≈ n log₂ n</td></tr>
+  <tr><td>D4 Inversions (merge)</td><td contenteditable>–</td><td contenteditable>–</td><td contenteditable>–</td><td class="mu">≈ n log₂ n</td></tr>
+  <tr><td>D4 Brute force pairs</td><td contenteditable>–</td><td contenteditable>–</td><td contenteditable>–</td><td class="mu">n(n−1)/2</td></tr>
+  <tr><td>G1 Greedy selection</td><td contenteditable>–</td><td contenteditable>–</td><td contenteditable>–</td><td class="mu">≈ n after sort</td></tr>
+ </table>
+ <p class="mu">Fill these with the exact counts printed by your own main.c, then explain growth: each 10× in N should give a little more than 10× for n log n, but 100× for n².</p>
+ <aside>[Member 1 · ~1:00] Type real numbers into the table before recording (cells are editable). State what matched theory and anything surprising.</aside>
+</section>
+
+<section class="slide">
+ <div class="eyebrow">Wrap-up</div>
+ <h2>Key <em>takeaways</em></h2>
+ <div class="grid g3">
+  <div class="card"><h3>D3</h3><p>Three candidates: left, right, crossing. <code>n log n</code>.</p></div>
+  <div class="card"><h3>D4</h3><p>Merge and count. <code>n log n</code> vs <code>n²</code> brute force.</p></div>
+  <div class="card"><h3>G1</h3><p>Earliest finish first. Optimal, with a reason.</p></div>
+ </div>
+ <p>Thank you for watching. <span class="mu">Group 6 · Section BREU1 · Caraga State University, CCIS</span></p>
+ <aside>[All members · ~0:30] Each member gives one closing sentence. Total target: 8–10 minutes for 3 micro-topics.</aside>
+</section>
+
+</div></main>
+<footer><button class="btn sec" id="bk" onclick="show(i-1)">← Back</button>
+<div style="text-align:center"><div class="dots" id="dots"></div><div id="ct"></div><div class="hint">← → keys · N speaker notes · F fullscreen</div></div>
+<button class="btn pri" id="nx" onclick="show(i+1)">Next →</button></footer>
+<div id="notes"></div>
+<script>
+const S=[...document.querySelectorAll('.slide')],N=document.getElementById('notes'),D=document.getElementById('dots'),L=[...document.querySelectorAll('#nav a')];let i=0;
+S.forEach((_,k)=>{const d=document.createElement('i');d.onclick=()=>show(k);D.appendChild(d)});
+L.forEach(a=>a.onclick=()=>show(+a.dataset.g));
+function show(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,k)=>s.classList.toggle('on',k===i));
+ [...D.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+ let cur=0;L.forEach((a,k)=>{if(+a.dataset.g<=i)cur=k});L.forEach((a,k)=>a.classList.toggle('on',k===cur));
+ document.getElementById('ct').textContent='Slide '+(i+1)+' of '+S.length;
+ document.getElementById('bk').disabled=i===0;const nx=document.getElementById('nx');nx.disabled=i===S.length-1;nx.textContent=i===S.length-1?'The End':'Next →';
+ const a=S[i].querySelector('aside');N.innerHTML=a?a.innerHTML:'';}
+function fit(){const m=document.querySelector('main'),k=Math.min(m.clientWidth/1300,m.clientHeight/740);document.getElementById('stage').style.transform='translate(-50%,-50%) scale('+k+')'}
+addEventListener('resize',fit);fit();show(0);
+addEventListener('keydown',e=>{if(e.target.isContentEditable)return;
+ if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(i+1)}
+ else if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);
+ else if(e.key==='n'||e.key==='N')N.classList.toggle('on');
+ else if(e.key==='f'||e.key==='F')document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();});
+</script></body></html>
